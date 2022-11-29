@@ -25,7 +25,7 @@ void setup() {
 
   Firebase.begin(URL, SECRET);
   Firebase.reconnectWiFi(true); // In case of a disconnecton
-  Serial.print("Connected to database");  
+  Serial.println("\nConnected to database");  
 }
 
 void loop() {
