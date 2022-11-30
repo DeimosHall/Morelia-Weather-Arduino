@@ -17,8 +17,8 @@ FirebaseData myFirebaseData;
 OneWire oneWire(TEMP_SENSOR);
 DallasTemperature sensor(&oneWire);
 
-const int SEND_TIME = 10; // Time to send temperature to the database in seconds
-int elapsedTime = 0;
+const int SEND_TIME = 60; // Time to send the temperature to the database in seconds
+int elapsedTime = SEND_TIME; // Time counter to validate SEND_TIME
 
 void setup() {
   pinMode(RGB_RED, OUTPUT);
@@ -28,14 +28,7 @@ void setup() {
   Serial.begin(115200);
   sensor.begin(); // Start the DS18B20 sensor
 
-  Serial.print("Conecting to network: " + String(ssid));
-  setRed();
-  
-  WiFi.begin(ssid, pass);
-  while(WiFi.status() != WL_CONNECTED) {
-    Serial.print(".");
-    delay(500);
-  }
+  connectToWiFi();
 
   Firebase.begin(URL, SECRET);
   Firebase.reconnectWiFi(true); // In case of a disconnection
@@ -43,6 +36,7 @@ void setup() {
 }
 
 void loop() {
+  connectToWiFi();
   checkSensorStatus();
 
   Serial.println("Temperature: " + String(getSensorTemp()));
@@ -54,7 +48,18 @@ void loop() {
     elapsedTime++;
   }
   
-  delay(1000);
+  delay(1000); 
+}
+
+void connectToWiFi() {
+  Serial.print("Conecting to network: " + String(ssid));
+  
+  while(WiFi.status() != WL_CONNECTED) {
+    WiFi.begin(ssid, pass);
+    Serial.print(".");
+    setRed();
+    delay(500);
+  }
 }
 
 void checkSensorStatus() {
